@@ -101,6 +101,6 @@ export class CircuitBreakerService {
         nextAttemptTime: 0,
       });
     }
-    return this.breakers.get(serviceName);
+    return this.breakers.get(serviceName)!;
   }
 }

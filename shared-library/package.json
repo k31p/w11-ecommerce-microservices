@@ -1,0 +1,23 @@
+{
+  "name": "@ecommerce/shared-library",
+  "version": "1.0.0",
+  "description": "Shared library for e-commerce microservices",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "license": "MIT",
+  "packageManager": "yarn@1.22.22",
+  "dependencies": {
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^11.1.19",
+    "@nestjs/core": "^11.1.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.2",
+    "typescript": "^6.0.3"
+  }
+}

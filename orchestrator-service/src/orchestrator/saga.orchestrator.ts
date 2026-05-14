@@ -42,8 +42,12 @@ export class SagaOrchestrator {
 
     try {
       await this.executeStep(saga_id, CommandType.CREATE_ORDER, order_request);
-    } catch (error) {
-      this.logger.error(`❌ Saga failed: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(`❌ Saga failed: ${error.message}`);
+      } else {
+        this.logger.error(`❌ Saga failed: Unknown error`);
+      }
       await this.compensate(saga_id);
     }
 
@@ -75,8 +79,12 @@ export class SagaOrchestrator {
 
       await this.recordStep(saga_id, commandType);
       await this.executeNextStep(saga_id, commandType, response.data);
-    } catch (error) {
-      this.logger.error(`❌ Step execution failed: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(`❌ Step execution failed: ${error.message}`);
+      } else {
+        this.logger.error(`❌ Step execution failed: Unknown error`);
+      }
       throw error;
     }
   }
@@ -85,7 +93,7 @@ export class SagaOrchestrator {
     command: any,
     saga: SagaEntity,
     maxRetries = 3,
-  ) {
+  ): Promise<any> {
     const maxRetryCount = saga.retry_count[command.command_type] || 0;
 
     if (maxRetryCount >= maxRetries) {
@@ -98,10 +106,12 @@ export class SagaOrchestrator {
         () => this.commandDispatcher.dispatch(command),
       );
       return response;
-    } catch (error) {
-      this.logger.warn(
-        `⚠️ Retry attempt ${maxRetryCount + 1} for ${command.command_type}`,
-      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.warn(
+          `⚠️ Retry attempt ${maxRetryCount + 1} for ${command.command_type}`,
+        );
+      }
       saga.retry_count[command.command_type] = maxRetryCount + 1;
       await this.sagaRepository.save(saga);
 
@@ -149,7 +159,7 @@ export class SagaOrchestrator {
     saga.current_state = SagaStateEnum.COMPENSATING;
     await this.sagaRepository.save(saga);
 
-    const compensationMap = {
+    const compensationMap: Record<string, CommandType[]> = {
       [SagaStateEnum.STOCK_RESERVED]: [CommandType.CANCEL_ORDER],
       [SagaStateEnum.PAYMENT_COMPLETED]: [
         CommandType.REFUND_PAYMENT,
@@ -163,7 +173,8 @@ export class SagaOrchestrator {
       ],
     };
 
-    const compensationSteps = compensationMap[saga.current_state] || [];
+    const compensationSteps: CommandType[] =
+      compensationMap[saga.current_state] || [];
 
     for (const compensationStep of compensationSteps) {
       try {
@@ -177,10 +188,12 @@ export class SagaOrchestrator {
 
         await this.commandDispatcher.dispatch(command);
         this.logger.log(`✅ Compensation step completed: ${compensationStep}`);
-      } catch (error) {
-        this.logger.error(
-          `❌ Compensation step failed: ${compensationStep} - ${error.message}`,
-        );
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          this.logger.error(
+            `❌ Compensation step failed: ${compensationStep} - ${error.message}`,
+          );
+        }
       }
     }
 
@@ -190,7 +203,9 @@ export class SagaOrchestrator {
 
   private async recordStep(saga_id: string, step: CommandType) {
     const saga = await this.sagaRepository.findOne({ where: { saga_id } });
-    const stateMap = {
+    if (!saga) return;
+
+    const stateMap: Record<string, SagaStateEnum> = {
       [CommandType.CREATE_ORDER]: SagaStateEnum.ORDER_CREATED,
       [CommandType.RESERVE_STOCK]: SagaStateEnum.STOCK_RESERVED,
       [CommandType.CHARGE_PAYMENT]: SagaStateEnum.PAYMENT_COMPLETED,
@@ -210,6 +225,7 @@ export class SagaOrchestrator {
   private async completeSaga(saga_id: string) {
     this.logger.log(`✅ Saga completed: ${saga_id}`);
     const saga = await this.sagaRepository.findOne({ where: { saga_id } });
+    if (!saga) return;
     saga.current_state = SagaStateEnum.COMPLETED;
     await this.sagaRepository.save(saga);
   }

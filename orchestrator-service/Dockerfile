@@ -1,13 +1,19 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /app/
 
-COPY package*.json ./
+# Copy package.json and yarn.lock from orchestrator-service
+COPY orchestrator-service/package.json orchestrator-service/yarn.lock ./
 
-RUN npm ci --only=production
+# Install dependencies
+RUN yarn install --frozen-lockfile/
 
-COPY dist ./dist
+# Copy source code from orchestrator-service
+COPY orchestrator-service/ .
 
-EXPOSE 3000
+# Build the application
+RUN yarn build
+
+EXPOSE 3001/
 
 CMD ["node", "dist/main"]

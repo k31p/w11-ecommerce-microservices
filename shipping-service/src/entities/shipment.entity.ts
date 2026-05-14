@@ -1,34 +1,44 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 export enum ShipmentStatus {
-  PENDING = 'PENDING',
-  SHIPPED = 'SHIPPED',
-  CANCELLED = 'CANCELLED',
+  PENDING = "PENDING",
+  SHIPPED = "SHIPPED",
+  CANCELLED = "CANCELLED",
 }
 
-@Entity('shipments')
+@Entity("shipments")
 export class ShipmentEntity {
-  @PrimaryColumn('uuid')
-  shipment_id: string;
+  @PrimaryColumn("uuid")
+  shipment_id: string = "";
 
-  @Column('uuid')
-  saga_id: string;
+  @Column("uuid")
+  saga_id: string = "";
 
-  @Column('uuid')
-  order_id: string;
+  @Column("uuid")
+  order_id: string = "";
 
-  @Column({ type: 'enum', enum: ShipmentStatus, default: ShipmentStatus.PENDING })
-  status: ShipmentStatus;
+  @Column({
+    type: "enum",
+    enum: ShipmentStatus,
+    default: ShipmentStatus.PENDING,
+  })
+  status: ShipmentStatus = ShipmentStatus.PENDING;
 
   @Column({ nullable: true })
-  tracking_number: string;
+  tracking_number: string = "";
 
   @Column({ nullable: true })
-  error_message: string;
+  error_message: string = "";
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at: Date = new Date();
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at: Date = new Date();
 }

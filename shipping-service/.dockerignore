@@ -3,3 +3,6 @@ dist
 .git
 .env
 .DS_Store
+package-lock.json
+# Keep yarn.lock for Docker builds
+!yarn.lock

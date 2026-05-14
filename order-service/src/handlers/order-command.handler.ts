@@ -30,13 +30,15 @@ export class OrderCommandHandler {
         default:
           throw new Error(`Unknown command: ${command.command_type}`);
       }
-    } catch (error) {
-      this.logger.error(`❌ Command failed: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(`❌ Command failed: ${error.message}`);
+      }
       return {
         saga_id: command.saga_id,
         request_id: command.request_id,
         success: false,
-        message: error.message,
+        message: error instanceof Error ? error.message : String(error),
       };
     }
   }

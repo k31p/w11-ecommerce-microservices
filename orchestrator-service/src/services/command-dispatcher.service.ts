@@ -29,7 +29,8 @@ export class CommandDispatcher {
   constructor(private readonly httpService: HttpService) {}
 
   async dispatch(command: any) {
-    const serviceUrl = this.serviceMap[command.command_type];
+    const serviceUrl =
+      this.serviceMap[command.command_type as keyof typeof this.serviceMap];
 
     if (!serviceUrl) {
       throw new Error(
@@ -49,10 +50,12 @@ export class CommandDispatcher {
       );
 
       return response.data;
-    } catch (error) {
-      this.logger.error(
-        `❌ Failed to dispatch command: ${command.command_type} - ${error.message}`,
-      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(
+          `❌ Failed to dispatch command: ${command.command_type} - ${error.message}`,
+        );
+      }
       throw error;
     }
   }

@@ -27,9 +27,14 @@ export class OrderService {
         ),
       );
       return response.data;
-    } catch (error) {
-      this.logger.error(`Failed to start saga: ${error.message}`);
-      throw new Error(`Failed to start saga: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(`Failed to start saga: ${error.message}`);
+        throw new Error(`Failed to start saga: ${error.message}`);
+      } else {
+        this.logger.error(`Failed to start saga: Unknown error`);
+        throw new Error(`Failed to start saga: Unknown error`);
+      }
     }
   }
 
@@ -42,9 +47,14 @@ export class OrderService {
         }),
       );
       return response.data;
-    } catch (error) {
-      this.logger.error(`Failed to get saga status: ${error.message}`);
-      throw new Error(`Failed to get saga status: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(`Failed to get saga status: ${error.message}`);
+        throw new Error(`Failed to get saga status: ${error.message}`);
+      } else {
+        this.logger.error(`Failed to get saga status: Unknown error`);
+        throw new Error(`Failed to get saga status: Unknown error`);
+      }
     }
   }
 }

@@ -1,34 +1,40 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 export enum OrderStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  CANCELLED = 'CANCELLED',
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  CANCELLED = "CANCELLED",
 }
 
-@Entity('orders')
+@Entity("orders")
 export class OrderEntity {
-  @PrimaryColumn('uuid')
-  order_id: string;
+  @PrimaryColumn("uuid")
+  order_id: string = "";
 
-  @Column('uuid')
-  saga_id: string;
+  @Column("uuid")
+  saga_id: string = "";
 
-  @Column('uuid')
-  user_id: string;
+  @Column("uuid")
+  user_id: string = "";
 
-  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING })
-  status: OrderStatus;
+  @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.PENDING })
+  status: OrderStatus = OrderStatus.PENDING;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  total_amount: number;
+  @Column({ type: "decimal", precision: 10, scale: 2 })
+  total_amount: number = 0;
 
-  @Column({ type: 'jsonb' })
-  items: Record<string, any>;
+  @Column({ type: "jsonb" })
+  items: Record<string, any> = {};
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at: Date = new Date();
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at: Date = new Date();
 }

@@ -1,43 +1,49 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 export enum SagaStateEnum {
-  INIT = 'INIT',
-  ORDER_CREATED = 'ORDER_CREATED',
-  STOCK_RESERVED = 'STOCK_RESERVED',
-  PAYMENT_COMPLETED = 'PAYMENT_COMPLETED',
-  SHIPPING_CREATED = 'SHIPPING_CREATED',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
-  COMPENSATING = 'COMPENSATING',
+  INIT = "INIT",
+  ORDER_CREATED = "ORDER_CREATED",
+  STOCK_RESERVED = "STOCK_RESERVED",
+  PAYMENT_COMPLETED = "PAYMENT_COMPLETED",
+  SHIPPING_CREATED = "SHIPPING_CREATED",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+  COMPENSATING = "COMPENSATING",
 }
 
-@Entity('sagas')
+@Entity("sagas")
 export class SagaEntity {
-  @PrimaryColumn('uuid')
-  saga_id: string;
+  @PrimaryColumn("uuid")
+  saga_id: string = "";
 
   @Column()
-  order_id: string;
+  order_id: string = "";
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: SagaStateEnum,
     default: SagaStateEnum.INIT,
   })
-  current_state: SagaStateEnum;
+  current_state: SagaStateEnum = SagaStateEnum.INIT;
 
-  @Column({ type: 'jsonb', default: [] })
-  step_history: any[];
+  @Column({ type: "jsonb", default: [] })
+  step_history: any[] = [];
 
-  @Column({ type: 'jsonb', default: {} })
-  retry_count: Record<string, number>;
+  @Column({ type: "jsonb", default: {} })
+  retry_count: Record<string, number> = {};
 
-  @Column({ type: 'jsonb', nullable: true })
-  order_data: Record<string, any>;
+  @Column({ type: "jsonb", nullable: true })
+  order_data: Record<string, any> = {};
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at: Date = new Date();
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at: Date = new Date();
 }

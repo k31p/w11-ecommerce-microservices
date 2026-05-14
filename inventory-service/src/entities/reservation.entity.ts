@@ -1,19 +1,19 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn } from "typeorm";
 
-@Entity('reservations')
+@Entity("reservations")
 export class ReservationEntity {
-  @PrimaryColumn('uuid')
-  reservation_id: string;
+  @PrimaryColumn("uuid")
+  reservation_id: string = "";
 
-  @Column('uuid')
-  saga_id: string;
+  @Column("uuid")
+  saga_id: string = "";
 
-  @Column('uuid')
-  product_id: string;
+  @Column("uuid")
+  product_id: string = "";
 
   @Column()
-  quantity: number;
+  quantity: number = 0;
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at: Date = new Date();
 }
