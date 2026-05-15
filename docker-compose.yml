@@ -69,6 +69,10 @@ services:
       DB_NAME: orchestrator_db
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      ORDER_SERVICE_URL: http://order-service:3002
+      INVENTORY_SERVICE_URL: http://inventory-service:3003
+      PAYMENT_SERVICE_URL: http://payment-service:3004
+      SHIPPING_SERVICE_URL: http://shipping-service:3005
     depends_on:
       postgres:
         condition: service_healthy

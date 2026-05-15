@@ -6,6 +6,16 @@ Guidelines for writing issues on this file
 
 ### Open Issues
 
+#### IS-17-20260515: Missing migrations or schema initialization after `synchronize: false`
+
+**Date**: 2026-05-15
+**Severity**: High
+**Description**: Most services have `synchronize: false` but no migrations or SQL schema initialization. This causes runtime errors like missing relations when the service first hits the database. Orchestrator now has a migration for `sagas`, but other services still lack migrations.
+
+**Impact**: Services can fail at runtime with `relation does not exist` errors.
+
+---
+
 #### IS-04-20260508: Improper shared-library implementation
 #### IS-02-20260508: Incorrect Dockerfile port configurations
 

@@ -23,6 +23,8 @@ import { CommandDispatcher } from "./services/command-dispatcher.service";
       password: process.env.DB_PASSWORD || "postgres",
       database: process.env.DB_NAME || "orchestrator_db",
       entities: [SagaEntity],
+      migrations: [__dirname + "/migrations/*.js"],
+      migrationsRun: true,
       synchronize: false,
     }),
     TypeOrmModule.forFeature([SagaEntity]),
