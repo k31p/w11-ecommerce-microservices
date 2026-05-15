@@ -1,0 +1,357 @@
+{
+  "info": {
+    "_postman_id": "1fdf4d40-d2cc-4808-bad9-77b37a5331c9",
+    "name": "ECommerce API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "21894980"
+  },
+  "variable": [
+    { "key": "apiGatewayHost", "value": "localhost", "type": "string" },
+    { "key": "apiGatewayPort", "value": "3000", "type": "string" },
+    { "key": "orchestratorHost", "value": "localhost", "type": "string" },
+    { "key": "orchestratorPort", "value": "3001", "type": "string" },
+    { "key": "orderServiceHost", "value": "localhost", "type": "string" },
+    { "key": "orderServicePort", "value": "3002", "type": "string" },
+    { "key": "inventoryServiceHost", "value": "localhost", "type": "string" },
+    { "key": "inventoryServicePort", "value": "3003", "type": "string" },
+    { "key": "paymentServiceHost", "value": "localhost", "type": "string" },
+    { "key": "paymentServicePort", "value": "3004", "type": "string" },
+    { "key": "shippingServiceHost", "value": "localhost", "type": "string" },
+    { "key": "shippingServicePort", "value": "3005", "type": "string" },
+    { "key": "sagaId", "value": "saga-123", "type": "string" },
+    { "key": "requestId", "value": "req-123", "type": "string" },
+    { "key": "orderId", "value": "order-123", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "API Gateway",
+      "item": [
+        {
+          "name": "Checkout Order",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"user-123\",\n  \"items\": [\n    {\n      \"product_id\": \"product-456\",\n      \"quantity\": 2,\n      \"price\": 29.99\n    }\n  ],\n  \"total_amount\": 59.98\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://{{apiGatewayHost}}:{{apiGatewayPort}}/api/v1/orders/checkout",
+              "protocol": "http",
+              "host": ["{{apiGatewayHost}}"],
+              "port": "{{apiGatewayPort}}",
+              "path": ["api", "v1", "orders", "checkout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Saga Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{apiGatewayHost}}:{{apiGatewayPort}}/api/v1/orders/saga/{{sagaId}}",
+              "protocol": "http",
+              "host": ["{{apiGatewayHost}}"],
+              "port": "{{apiGatewayPort}}",
+              "path": ["api", "v1", "orders", "saga", "{{sagaId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{apiGatewayHost}}:{{apiGatewayPort}}/api/v1/health",
+              "protocol": "http",
+              "host": ["{{apiGatewayHost}}"],
+              "port": "{{apiGatewayPort}}",
+              "path": ["api", "v1", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orchestrator Service",
+      "item": [
+        {
+          "name": "Start Saga",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"saga_id\": \"{{sagaId}}\",\n  \"order_request\": {\n    \"user_id\": \"user-123\",\n    \"items\": [\n      {\n        \"product_id\": \"product-456\",\n        \"quantity\": 2,\n        \"price\": 29.99\n      }\n    ],\n    \"total_amount\": 59.98\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://{{orchestratorHost}}:{{orchestratorPort}}/saga/start",
+              "protocol": "http",
+              "host": ["{{orchestratorHost}}"],
+              "port": "{{orchestratorPort}}",
+              "path": ["saga", "start"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Saga Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{orchestratorHost}}:{{orchestratorPort}}/saga/{{sagaId}}/status",
+              "protocol": "http",
+              "host": ["{{orchestratorHost}}"],
+              "port": "{{orchestratorPort}}",
+              "path": ["saga", "{{sagaId}}", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{orchestratorHost}}:{{orchestratorPort}}/saga/health",
+              "protocol": "http",
+              "host": ["{{orchestratorHost}}"],
+              "port": "{{orchestratorPort}}",
+              "path": ["saga", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Order Service",
+      "item": [
+        {
+          "name": "Create Order Command",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command_type\": \"CREATE_ORDER\",\n  \"saga_id\": \"{{sagaId}}\",\n  \"request_id\": \"{{requestId}}\",\n  \"payload\": {\n    \"user_id\": \"user-123\",\n    \"total_amount\": 59.98,\n    \"items\": [\n      {\n        \"product_id\": \"product-456\",\n        \"quantity\": 2,\n        \"price\": 29.99\n      }\n    ]\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://{{orderServiceHost}}:{{orderServicePort}}/api/v1/command",
+              "protocol": "http",
+              "host": ["{{orderServiceHost}}"],
+              "port": "{{orderServicePort}}",
+              "path": ["api", "v1", "command"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Order Command",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command_type\": \"CANCEL_ORDER\",\n  \"saga_id\": \"{{sagaId}}\",\n  \"request_id\": \"{{requestId}}\",\n  \"payload\": {}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://{{orderServiceHost}}:{{orderServicePort}}/api/v1/command",
+              "protocol": "http",
+              "host": ["{{orderServiceHost}}"],
+              "port": "{{orderServicePort}}",
+              "path": ["api", "v1", "command"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{orderServiceHost}}:{{orderServicePort}}/api/v1/orders/health",
+              "protocol": "http",
+              "host": ["{{orderServiceHost}}"],
+              "port": "{{orderServicePort}}",
+              "path": ["api", "v1", "orders", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Inventory Service",
+      "item": [
+        {
+          "name": "Reserve Stock Command",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command_type\": \"RESERVE_STOCK\",\n  \"saga_id\": \"{{sagaId}}\",\n  \"request_id\": \"{{requestId}}\",\n  \"payload\": {\n    \"items\": [\n      {\n        \"product_id\": \"product-456\",\n        \"quantity\": 2\n      }\n    ]\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://{{inventoryServiceHost}}:{{inventoryServicePort}}/api/v1/command",
+              "protocol": "http",
+              "host": ["{{inventoryServiceHost}}"],
+              "port": "{{inventoryServicePort}}",
+              "path": ["api", "v1", "command"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Release Stock Command",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command_type\": \"RELEASE_STOCK\",\n  \"saga_id\": \"{{sagaId}}\",\n  \"request_id\": \"{{requestId}}\",\n  \"payload\": {}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://{{inventoryServiceHost}}:{{inventoryServicePort}}/api/v1/command",
+              "protocol": "http",
+              "host": ["{{inventoryServiceHost}}"],
+              "port": "{{inventoryServicePort}}",
+              "path": ["api", "v1", "command"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{inventoryServiceHost}}:{{inventoryServicePort}}/api/v1/inventory/health",
+              "protocol": "http",
+              "host": ["{{inventoryServiceHost}}"],
+              "port": "{{inventoryServicePort}}",
+              "path": ["api", "v1", "inventory", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Service",
+      "item": [
+        {
+          "name": "Charge Payment Command",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command_type\": \"CHARGE_PAYMENT\",\n  \"saga_id\": \"{{sagaId}}\",\n  \"request_id\": \"{{requestId}}\",\n  \"payload\": {\n    \"order_id\": \"{{orderId}}\",\n    \"total_amount\": 59.98\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://{{paymentServiceHost}}:{{paymentServicePort}}/api/v1/command",
+              "protocol": "http",
+              "host": ["{{paymentServiceHost}}"],
+              "port": "{{paymentServicePort}}",
+              "path": ["api", "v1", "command"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refund Payment Command",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command_type\": \"REFUND_PAYMENT\",\n  \"saga_id\": \"{{sagaId}}\",\n  \"request_id\": \"{{requestId}}\",\n  \"payload\": {}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://{{paymentServiceHost}}:{{paymentServicePort}}/api/v1/command",
+              "protocol": "http",
+              "host": ["{{paymentServiceHost}}"],
+              "port": "{{paymentServicePort}}",
+              "path": ["api", "v1", "command"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{paymentServiceHost}}:{{paymentServicePort}}/api/v1/payments/health",
+              "protocol": "http",
+              "host": ["{{paymentServiceHost}}"],
+              "port": "{{paymentServicePort}}",
+              "path": ["api", "v1", "payments", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Shipping Service",
+      "item": [
+        {
+          "name": "Create Shipment Command",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command_type\": \"CREATE_SHIPMENT\",\n  \"saga_id\": \"{{sagaId}}\",\n  \"request_id\": \"{{requestId}}\",\n  \"payload\": {\n    \"order_id\": \"{{orderId}}\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://{{shippingServiceHost}}:{{shippingServicePort}}/api/v1/command",
+              "protocol": "http",
+              "host": ["{{shippingServiceHost}}"],
+              "port": "{{shippingServicePort}}",
+              "path": ["api", "v1", "command"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{shippingServiceHost}}:{{shippingServicePort}}/api/v1/shipments/health",
+              "protocol": "http",
+              "host": ["{{shippingServiceHost}}"],
+              "port": "{{shippingServicePort}}",
+              "path": ["api", "v1", "shipments", "health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

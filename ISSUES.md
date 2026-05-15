@@ -6,6 +6,8 @@ Guidelines for writing issues on this file
 
 ### Open Issues
 
+
+
 #### IS-17-20260515: Missing migrations or schema initialization after `synchronize: false`
 
 **Date**: 2026-05-15
@@ -197,6 +199,22 @@ app.enableCors();
 **Impact**: Configuration inconsistencies across services.
 
 ### Closed Issues
+
+#### IS-19-20260515: API Gateway health endpoint is double-prefixed [RESOLVED]
+
+**Date**: 2026-05-15
+**Resolved**: 2026-05-15
+**Resolution**: Removed the duplicate controller prefix so the health endpoint is `/api/v1/health`, matching the global prefix and docker-compose health check.
+
+---
+
+#### IS-18-20260515: Dockerfile command typos in service builds [RESOLVED]
+
+**Date**: 2026-05-15
+**Resolved**: 2026-05-15
+**Resolution**: Fixed `RUN yarn install --frozen-lockfile/` and `EXPOSE 3001/` typos in service Dockerfiles.
+
+---
 
 #### IS-01-20260508: Missing package.json in all services [RESOLVED]
 

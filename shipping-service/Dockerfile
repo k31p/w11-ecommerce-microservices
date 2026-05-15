@@ -6,7 +6,7 @@ WORKDIR /app/
 COPY shipping-service/package.json shipping-service/yarn.lock ./
 
 # Install dependencies
-RUN yarn install --frozen-lockfile/
+RUN yarn install --frozen-lockfile
 
 # Copy source code from shipping-service
 COPY shipping-service/ .

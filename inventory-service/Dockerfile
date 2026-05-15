@@ -6,7 +6,7 @@ WORKDIR /app/
 COPY inventory-service/package.json inventory-service/yarn.lock ./
 
 # Install dependencies
-RUN yarn install --frozen-lockfile/
+RUN yarn install --frozen-lockfile
 
 # Copy source code from inventory-service
 COPY inventory-service/ .

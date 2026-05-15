@@ -6,7 +6,7 @@ WORKDIR /app/
 COPY order-service/package.json order-service/yarn.lock ./
 
 # Install dependencies
-RUN yarn install --frozen-lockfile/
+RUN yarn install --frozen-lockfile
 
 # Copy source code from order-service
 COPY order-service/ .

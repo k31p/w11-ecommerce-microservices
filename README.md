@@ -1,8 +1,8 @@
-# 🚀 Saga Orchestration E-Commerce Microservices
+# Saga Orchestration E Commerce Microservices
 
-Complete implementation of **Saga Orchestration Pattern** for e-commerce checkout flow with **Circuit Breaker**, **Retry Logic**, and **Compensation Transactions**.
+Implementasi lengkap **Saga Orchestration Pattern**. Ini adalah pola untuk mengatur transaksi lintas layanan secara terpusat dengan **Circuit Breaker** sebagai mekanisme pemutus sementara saat layanan gagal, **Retry Logic** untuk mencoba ulang secara terukur, dan **Compensation Transactions** untuk membatalkan langkah yang sudah berhasil jika alur gagal di tengah.
 
-## 📊 Architecture
+## Arsitektur
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌──────────────┐
@@ -23,69 +23,126 @@ Complete implementation of **Saga Orchestration Pattern** for e-commerce checkou
                     └──────────────┘     └──────────────┘
 ```
 
-## 🛠️ Technologies
+## Layanan dan Port
 
-- **NestJS** - Progressive Node.js framework
-- **TypeScript** - Type-safe JavaScript
-- **Redis** - Message broker for async communication
-- **PostgreSQL** - Database for each service
-- **Docker** - Containerization
-- **Yarn** - Package manager (v1.22.22)
+| Layanan | Port | Peran |
+|---------|------|-------|
+| API Gateway | 3000 | Pintu masuk API publik |
+| Orchestrator Service | 3001 | Pengatur alur Saga |
+| Order Service | 3002 | Siklus hidup order |
+| Inventory Service | 3003 | Pengelolaan stok |
+| Payment Service | 3004 | Proses pembayaran |
+| Shipping Service | 3005 | Proses pengiriman |
 
-## 🚀 Quick Start
+## Struktur Repository
 
-### Prerequisites
+```
+api-gateway/
+orchestrator-service/
+order-service/
+inventory-service/
+payment-service/
+shipping-service/
+shared-library/
+postgres-init/
+```
 
-- Node.js (v18+)
-- Yarn 1.22.22
-- Docker & Docker Compose
-- PostgreSQL (if running locally)
+## Teknologi
 
-### Local Development
+- NestJS sebagai framework backend
+- TypeScript sebagai bahasa pemrograman
+- Redis sebagai message broker
+- PostgreSQL sebagai database per layanan
+- Docker sebagai container runtime
+- Docker Compose sebagai orkestrasi container lokal
+- Yarn sebagai package manager
 
-```bash
-# Clone the repository
+## Prasyarat
+
+- Node.js versi 18 atau lebih baru
+- Yarn versi 1.22.22
+- Docker dan Docker Compose
+- PostgreSQL hanya jika menjalankan tanpa Docker
+
+Jika Yarn belum terpasang, gunakan Corepack:
+
+```
+corepack enable
+corepack prepare yarn@stable --activate
+```
+
+## Pengembangan Lokal
+
+### 1. Install dependencies
+
+```
 cd ecommerce
 
-# Install dependencies for all services
-cd api-gateway && yarn install
+cd shared-library && yarn install
+cd ../api-gateway && yarn install
 cd ../orchestrator-service && yarn install
 cd ../order-service && yarn install
 cd ../inventory-service && yarn install
 cd ../payment-service && yarn install
 cd ../shipping-service && yarn install
-cd ../shared-library && yarn install
+```
 
-# Build all services
+### 2. Build shared library
+
+API Gateway menggunakan tipe dari shared library. Build dulu sebelum build atau menjalankan API Gateway:
+
+```
+cd shared-library && yarn build
+```
+
+### 3. Build layanan
+
+```
 cd api-gateway && yarn build
 cd ../orchestrator-service && yarn build
-# ... (repeat for all services)
-
-# Or run in development mode (per service)
-cd <service-directory> && yarn start:dev
+cd ../order-service && yarn build
+cd ../inventory-service && yarn build
+cd ../payment-service && yarn build
+cd ../shipping-service && yarn build
 ```
 
-### Using Docker
+### 4. Menjalankan layanan
 
-```bash
-# Build and start all services
-docker-compose up -d
+Contoh menjalankan API Gateway:
 
-# Check service health
+```
+cd api-gateway && yarn start:dev
+```
+
+## Docker
+
+### Build dan jalankan semua layanan
+
+```
+docker compose up -d --build
+```
+
+### Health check
+
+Health check adalah endpoint untuk melihat status layanan.
+
+```
 curl http://localhost:3000/api/v1/health
 curl http://localhost:3001/saga/health
-# ... (check all services)
-
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
+curl http://localhost:3002/api/v1/orders/health
+curl http://localhost:3003/api/v1/inventory/health
+curl http://localhost:3004/api/v1/payments/health
+curl http://localhost:3005/api/v1/shipments/health
 ```
 
-### Environment Variables
+### Perbedaan build lokal dan Docker
 
-Each service has a `.env.example` file. Copy to `.env` and modify as needed:
+- Lokal. Kamu bisa menggunakan Yarn link. Fitur ini menghubungkan package lokal agar perubahan langsung terbaca.
+- Docker. Image API Gateway menyalin shared-library ke build environment lalu melakukan install dan build di dalam container. Tidak ada symlink yang digunakan.
+
+## Environment Variables
+
+Setiap layanan memiliki file `.env.example`. Salin menjadi `.env` dan sesuaikan nilainya:
 
 - `api-gateway/.env.example`
 - `orchestrator-service/.env.example`
@@ -94,13 +151,13 @@ Each service has a `.env.example` file. Copy to `.env` and modify as needed:
 - `payment-service/.env.example`
 - `shipping-service/.env.example`
 
-## 📝 API Documentation
+## Dokumentasi API
 
-### API Gateway (Port 3000)
+### API Gateway
 
-#### Start Checkout
+#### Checkout Order
 
-```bash
+```
 POST http://localhost:3000/api/v1/orders/checkout
 Content-Type: application/json
 
@@ -117,17 +174,17 @@ Content-Type: application/json
 }
 ```
 
-#### Check Saga Status
+#### Cek status Saga
 
-```bash
+```
 GET http://localhost:3000/api/v1/orders/saga/{saga_id}
 ```
 
-### Orchestrator Service (Port 3001)
+### Orchestrator Service
 
 #### Start Saga
 
-```bash
+```
 POST http://localhost:3001/saga/start
 Content-Type: application/json
 
@@ -137,12 +194,30 @@ Content-Type: application/json
 }
 ```
 
-#### Get Saga Status
+#### Cek status Saga
 
-```bash
+```
 GET http://localhost:3001/saga/{saga_id}/status
 ```
 
-## 📝 License
+## Troubleshooting
+
+### Docker build gagal dengan `getaddrinfo EAI_AGAIN registry.yarnpkg.com`
+
+Ini adalah masalah DNS pada Docker. Coba salah satu opsi berikut:
+
+```
+docker build --network=host -f api-gateway/Dockerfile -t api-gateway .
+```
+
+Atau atur DNS Docker, contoh:
+
+```
+{
+  "dns": ["1.1.1.1", "8.8.8.8"]
+}
+```
+
+## Lisensi
 
 MIT

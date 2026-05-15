@@ -6,7 +6,7 @@ WORKDIR /app/
 COPY payment-service/package.json payment-service/yarn.lock ./
 
 # Install dependencies
-RUN yarn install --frozen-lockfile/
+RUN yarn install --frozen-lockfile
 
 # Copy source code from payment-service
 COPY payment-service/ .
